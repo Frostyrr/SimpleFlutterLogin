@@ -31,7 +31,7 @@ lib/
 
 ---
 
-## 🧠 Riverpod State Management Made Easy
+## 🧠 Riverpod Application In this Project
 
 ### 1. `ProviderScope` (The Global Store)
 Located in `lib/main.dart`:
