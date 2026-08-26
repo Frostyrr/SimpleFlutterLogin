@@ -33,8 +33,6 @@ lib/
 
 ## 🧠 Riverpod State Management Made Easy
 
-If you are new to Flutter or Riverpod, think of Riverpod as a **smart messenger** that connects your data (state) to your visual user interface (widgets).
-
 ### 1. `ProviderScope` (The Global Store)
 Located in `lib/main.dart`:
 ```dart
