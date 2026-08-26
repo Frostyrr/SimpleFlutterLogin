@@ -3,17 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/app/app.dart';
 
 void main() {
-  testWidgets('Login screen loads correctly', (WidgetTester tester) async {
-    // Build our app wrapped in ProviderScope and trigger a frame.
+  testWidgets('Login screen loads correctly with Resend layout', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: MyApp(),
       ),
     );
 
-    // Verify that key elements are rendered.
-    expect(find.text('Login'), findsWidgets);
-    expect(find.text('Email'), findsOneWidget);
-    expect(find.text('Password'), findsOneWidget);
+    // Verify key UI elements from the reference design
+    expect(find.text('Welcome Back'), findsOneWidget);
+    expect(find.text('Enter your credentials to sign in'), findsOneWidget);
+    expect(find.text('EMAIL ADDRESS'), findsOneWidget);
+    expect(find.text('PASSWORD'), findsOneWidget);
+    expect(find.text('Forgot Password?'), findsOneWidget);
+    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.text('Sign Up'), findsOneWidget);
   });
 }

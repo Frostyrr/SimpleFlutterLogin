@@ -1,11 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../providers/auth_provider.dart';
 import '../widgets/button.dart';
 import '../widgets/input.dart';
 
-/// The main login screen UI composing the form, reusable widgets, and Riverpod state.
+/// Clean, high-contrast Login Screen with silk metallic background wallpaper
+/// and Resend-inspired developer UI layout.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -13,131 +16,300 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
-  // Controllers to capture user input
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final AnimationController _animController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOut,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.04),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    _animController.forward();
   }
 
   @override
   void dispose() {
-    // Dispose controllers to free memory
     _emailController.dispose();
     _passwordController.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
   void _onLoginPressed() {
-    // Unfocus any active keyboard
     FocusScope.of(context).unfocus();
-
-    // Call the login logic from AuthNotifier using ref.read
-    ref
-        .read(authProvider.notifier)
-        .login(_emailController.text, _passwordController.text);
+    ref.read(authProvider.notifier).login(
+          _emailController.text,
+          _passwordController.text,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watch the authentication state to rebuild the UI when it changes
     final authState = ref.watch(authProvider);
 
-    // Listen to state changes for one-off side effects like showing a SnackBar
+    // Listen to authentication outcome for toast feedback
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.isAuthenticated) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            backgroundColor: const Color(0xFF18181B),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              side: const BorderSide(color: Color(0xFF22C55E), width: 1.0),
+            ),
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Color(0xFF22C55E), size: 18.0),
+                const SizedBox(width: 10.0),
+                Text(
+                  'Signed in successfully.',
+                  style: GoogleFonts.inter(
+                    fontSize: 13.0,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }
     });
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login'), centerTitle: true),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Icon(
-                Icons.lock_outline,
-                size: 64,
-                color: Colors.deepPurple,
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Welcome Back',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8.0),
-              const Text(
-                'Please sign in to continue',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 14.0),
-              ),
-              const SizedBox(height: 32.0),
+      backgroundColor: const Color(0xFF000000),
+      body: Stack(
+        children: [
+          // 1. Satin Metallic Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/bg.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
 
-              // Reusable Email Input Field
-              CustomInputField(
-                controller: _emailController,
-                label: 'Email',
-                hint: 'test@example.com',
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icons.email_outlined,
-              ),
-              const SizedBox(height: 16.0),
+          // 2. Subtle Dark Overlay for contrast & readability
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.45),
+            ),
+          ),
 
-              // Reusable Password Input Field
-              CustomInputField(
-                controller: _passwordController,
-                label: 'Password',
-                hint: 'password123',
-                obscureText: true,
-                prefixIcon: Icons.lock_outline,
-              ),
-              const SizedBox(height: 16.0),
+          // 3. Login Content with Frosted Glass Surface
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24.0),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28.0,
+                              vertical: 32.0,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xE60D0D10), // 90% semi-opaque dark surface
+                              borderRadius: BorderRadius.circular(24.0),
+                              border: Border.all(
+                                color: const Color(0x2EFFFFFF), // Subtle crisp glass hairline border
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Title
+                                Text(
+                                  'Welcome Back',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 26.0,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.6,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 6.0),
 
-              // Inline Error Message if any
-              if (authState.errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.red.shade200),
-                  ),
-                  child: Text(
-                    authState.errorMessage!,
-                    style: TextStyle(
-                      color: Colors.red.shade700,
-                      fontSize: 13.0,
+                                // Subtitle
+                                Text(
+                                  'Enter your credentials to sign in',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFFA1A1AA),
+                                  ),
+                                ),
+                                const SizedBox(height: 24.0),
+
+                                // Error Banner (Positioned directly at the top of Email Address)
+                                if (authState.errorMessage != null) ...[
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0,
+                                      vertical: 10.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF1C0D11),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      border: Border.all(
+                                        color: const Color(0x66F43F5E),
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline_rounded,
+                                          size: 16.0,
+                                          color: Color(0xFFFB7185),
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Expanded(
+                                          child: Text(
+                                            authState.errorMessage!,
+                                            style: GoogleFonts.inter(
+                                              color: const Color(0xFFFECDD3),
+                                              fontSize: 12.0,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18.0),
+                                ],
+
+                                // Email Field
+                                CustomInputField(
+                                  controller: _emailController,
+                                  label: 'Email Address',
+                                  hint: 'don.juan@gmail.com',
+                                  keyboardType: TextInputType.emailAddress,
+                                  prefixIcon: Icons.mail_outline_rounded,
+                                ),
+                                const SizedBox(height: 18.0),
+
+                                // Password Field
+                                CustomInputField(
+                                  controller: _passwordController,
+                                  label: 'Password',
+                                  hint: '••••••••••••',
+                                  obscureText: true,
+                                  prefixIcon: Icons.lock_outline_rounded,
+                                ),
+                                const SizedBox(height: 10.0),
+
+                                // Forgot Password link (right-aligned)
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: const Size(0, 0),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: const Color(0xFFA1A1AA),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20.0),
+
+                                // Primary Sign In Button
+                                CustomButton(
+                                  text: 'Sign In',
+                                  isLoading: authState.isLoading,
+                                  onPressed: _onLoginPressed,
+                                ),
+                                const SizedBox(height: 28.0),
+
+                                // Hairline Divider
+                                const Divider(
+                                  color: Color(0x1FFFFFFF),
+                                  height: 1.0,
+                                  thickness: 1.0,
+                                ),
+                                const SizedBox(height: 24.0),
+
+                                // Sign Up Footer
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Don't have an account? ",
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13.0,
+                                        color: const Color(0xFF71717A),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Text(
+                                        'Sign Up',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 16.0),
-              ],
-
-              // Reusable Login Button
-              CustomButton(
-                text: 'Login',
-                isLoading: authState.isLoading,
-                onPressed: _onLoginPressed,
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
