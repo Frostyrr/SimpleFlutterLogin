@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Minimalist input field with Resend-style graphite container,
-/// hairline border, and clean outline icons.
 class CustomInputField extends StatefulWidget {
   final TextEditingController controller;
   final String label;

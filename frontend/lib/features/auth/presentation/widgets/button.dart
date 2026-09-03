@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// High-contrast primary action button matching Resend's clean design.
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;

@@ -7,8 +7,6 @@ import '../providers/auth_provider.dart';
 import '../widgets/button.dart';
 import '../widgets/input.dart';
 
-/// Clean, high-contrast Login Screen with silk metallic background wallpaper
-/// and Resend-inspired developer UI layout.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
