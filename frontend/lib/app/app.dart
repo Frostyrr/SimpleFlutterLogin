@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../features/auth/presentation/screens/login_screen.dart';
 
-/// Root application widget configured with Resend-inspired minimalist dark theme.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -23,9 +22,7 @@ class MyApp extends StatelessWidget {
           outline: Color(0xFF1F1F23),
           error: Color(0xFFEF4444),
         ),
-        textTheme: GoogleFonts.interTextTheme(
-          ThemeData.dark().textTheme,
-        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         useMaterial3: true,
       ),
       home: const LoginScreen(),
