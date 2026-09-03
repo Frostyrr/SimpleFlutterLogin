@@ -32,9 +32,7 @@ lib/
 
 ---
 
-## 🧠 Riverpod State Management Made Easy
-
-If you are new to Flutter or Riverpod, think of Riverpod as a **smart messenger** that connects your data (state) to your visual user interface (widgets).
+## 🧠 The Use of Riverpod Architecture
 
 ### 1. `ProviderScope` (The Global Store)
 Located in `lib/main.dart`:
@@ -142,34 +140,6 @@ The application includes built-in mock authentication for practice:
 * **Password:** `password123`
 
 Any other credentials or blank fields will trigger an inline validation error banner above the email field.
-
----
-
-## 🛠️ How to Run & Test
-
-### Prerequisites
-* Flutter SDK (3.13+ recommended)
-* An active emulator, simulator, or connected device
-
-### 1. Install Dependencies
-```bash
-flutter pub get
-```
-
-### 2. Run the App
-```bash
-flutter run
-```
-
-### 3. Run Automated Tests
-```bash
-flutter test
-```
-
-### 4. Run Static Code Analyzer
-```bash
-flutter analyze
-```
 
 ---
 
